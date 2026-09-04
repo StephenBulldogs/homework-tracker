@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'home_screen.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 void main() {
   runApp(const HomeworkTrackerApp());
@@ -21,7 +22,7 @@ class HomeworkTrackerApp extends StatelessWidget {
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-  
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -37,18 +38,28 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.deepPurple,
       body: Center(
-        child: Text(
-          'Homework Tracker',
-          style: TextStyle(
-            fontSize: 28,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Homework Tracker',
+              style: TextStyle(
+                fontSize: 28,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 30),
+            LoadingAnimationWidget.threeArchedCircle(
+              color: const Color.fromARGB(255, 172, 5, 5),
+              size: 150,
+            ),
+          ],
         ),
       ),
     );
