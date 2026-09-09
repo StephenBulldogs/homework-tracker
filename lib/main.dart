@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'home_screen.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'main_navigation.dart';
 
 void main() {
   runApp(const HomeworkTrackerApp());
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
     });
   }
