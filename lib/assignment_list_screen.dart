@@ -67,9 +67,21 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
           final assignment = assignments[index];
           return ListTile(
             title: Text(assignment['title']),
-            trailing: Checkbox(
-              value: assignment['completed'],
-              onChanged: (value) => _toggleCompleted(index, value),
+            trailing: SizedBox(
+              width: 100, // Adjust the width as needed
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: assignment['completed'],
+                    onChanged: (value) => _toggleCompleted(index, value),
+                  ),
+                  IconButton(onPressed: (){
+                    setState(() {
+                      assignments.removeAt(index);
+                    });
+                  }, icon: const Icon(Icons.delete))
+                ],
+              )
             ),
           );
         },
