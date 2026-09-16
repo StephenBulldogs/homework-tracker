@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'main_navigation.dart';
+import 'views/main_navigation.dart';
 
 void main() {
   runApp(const HomeworkTrackerApp());

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../presenters/assignment_presenter.dart';
 
 class AssignmentListScreen extends StatefulWidget {
   const AssignmentListScreen({super.key});
@@ -9,7 +10,7 @@ class AssignmentListScreen extends StatefulWidget {
 
 class _AssignmentListScreenState extends State<AssignmentListScreen> {
 
-  final List<Map<String, dynamic>> assignments = [];
+  final AssignmentPresenter _presenter = AssignmentPresenter();
 
   void _showAddAssignmentDialog() {
     String newAssignmentTitle = '';
@@ -35,10 +36,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
               onPressed: () {
                 if (newAssignmentTitle.isNotEmpty) {
                   setState(() {
-                    assignments.add({
-                      'title': newAssignmentTitle,
-                      'completed': false,
-                    });
+                    _presenter.addAssignment(newAssignmentTitle.trim());
                   });
                   Navigator.pop(context); // Close dialog
                 }
@@ -51,38 +49,24 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
     );
   }
 
-  void _toggleCompleted(int index, bool? value) {
-    setState(() {
-      assignments[index]['completed'] = value ?? false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final assignments = _presenter.assignments;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Assignments'),),
+      appBar: AppBar(title: const Text('Assignments')),
       body: ListView.builder(
         itemCount: assignments.length,
         itemBuilder: (context, index) {
           final assignment = assignments[index];
-          return ListTile(
-            title: Text(assignment['title']),
-            trailing: SizedBox(
-              width: 100, // Adjust the width as needed
-              child: Row(
-                children: [
-                  Checkbox(
-                    value: assignment['completed'],
-                    onChanged: (value) => _toggleCompleted(index, value),
-                  ),
-                  IconButton(onPressed: (){
-                    setState(() {
-                      assignments.removeAt(index);
-                    });
-                  }, icon: const Icon(Icons.delete))
-                ],
-              )
-            ),
+          return CheckboxListTile(
+            title: Text(assignment.title),
+            value: assignment.isCompleted,
+            onChanged: (value) {
+              setState(() {
+                _presenter.toggleAssignmentCompletion(index);
+              });
+            },
           );
         },
       ),
