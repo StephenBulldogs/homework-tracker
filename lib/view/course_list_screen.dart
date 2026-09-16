@@ -16,6 +16,7 @@ class _CourseListScreenState extends State<CourseListScreen> {
     final isEditing = existing != null;
     String name = existing?.name ?? '';
     String? description = existing?.description;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -43,21 +44,9 @@ class _CourseListScreenState extends State<CourseListScreen> {
               onPressed: () {
                 if (name.trim().isNotEmpty) {
                   setState(() {
-                    if (isEditing && index != null) {
-                      presenter.updateCourse(
-                        index,
-                        name.trim(),
-                      description,
-                      );
-                    } else {
-                      presenter.addCourse(
-                        name.trim(),
-                        description,
-                      );
-                    }
+                    presenter.addCourse(name.trim(), description);
                   });
-
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close dialog
                 }
               },
               child: Text(isEditing ? 'Update' : 'Add'),
