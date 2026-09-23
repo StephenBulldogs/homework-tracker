@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'views/main_navigation.dart';
+import 'views/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const HomeworkTrackerApp());
 }
 
@@ -20,48 +23,36 @@ class HomeworkTrackerApp extends StatelessWidget {
   }
 }
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-      );
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.deepPurple,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Homework Tracker',
-              style: TextStyle(
-                fontSize: 28,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: Colors.deepPurple,
+            body: Center(
+              child: Text(
+                'Homework Tracker',
+                style: TextStyle(
+                  fontSize: 28,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            const SizedBox(height: 30),
-            LoadingAnimationWidget.threeArchedCircle(
-              color: const Color.fromARGB(255, 172, 5, 5),
-              size: 150,
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+        // If user is signed in
+        if (snapshot.hasData) {
+          return const MainNavigationScreen();
+        }
+        // If user is not signed in
+        return const LoginScreen();
+      },
     );
   }
 }
