@@ -19,8 +19,15 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _errorMessage;
 
   void _handleSignup() async {
+    final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+
+    if (!emailRegex.hasMatch(email)) {
+      setState(() => _errorMessage = 'Please enter a valid email address');
+      return;
+    }
 
     if (password != confirmPassword) {
       setState(() => _errorMessage = 'Passwords do not match');

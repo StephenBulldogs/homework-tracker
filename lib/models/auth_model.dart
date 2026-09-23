@@ -24,7 +24,7 @@ class AuthModel {
   Future<void> signOut() async {
     await _auth.signOut();
   }
-
+  
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
