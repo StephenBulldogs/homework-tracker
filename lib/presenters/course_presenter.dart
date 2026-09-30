@@ -5,21 +5,15 @@ class CoursePresenter {
 
   List<Course> get courses => _courses;
 
-  void addCourse(String name, String? description) {
-    _courses.add(Course(name: name, description: description));
+  Future<void> loadCourses() async {
+    final fetched = await Course.fetchCourses();
+    _courses
+        ..clear()
+        ..addAll(fetched);
   }
 
-void updateCourse(int index, String name, String? description) {
-  courses[index] = Course(
-    name: name,
-    description: description,
-  );
-}
-
-
-  void removeCourse(int index) {
-    if (index >= 0 && index < _courses.length) {
-      _courses.removeAt(index);
-    }
+  Future<void> addCourse(String name, String? description) async {
+    await Course.addCourse(name, description);
+    _courses.add(Course(name: name, description: description));
   }
 }

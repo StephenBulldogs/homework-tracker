@@ -11,6 +11,18 @@ class CourseListScreen extends StatefulWidget {
 
 class _CourseListScreenState extends State<CourseListScreen> {
   final CoursePresenter presenter = CoursePresenter();
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
+
+  Future<void> _loadCourses() async {
+    await presenter.loadCourses();
+    setState(() => _isLoading = false);
+  }
 
   void _showAddCourseDialog({Course? existing, int? index}) {
     final isEditing = existing != null;
@@ -40,27 +52,14 @@ class _CourseListScreenState extends State<CourseListScreen> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (name.trim().isNotEmpty) {
-                  setState(() {
-                    if (isEditing && index != null) {
-                      presenter.updateCourse(
-                        index,
-                        name.trim(),
-                      description,
-                      );
-                    } else {
-                      presenter.addCourse(
-                        name.trim(),
-                        description,
-                      );
-                    }
-                  });
-
+                  await presenter.addCourse(name.trim(), description);
+                  setState(() {});
                   Navigator.pop(context);
                 }
               },
-              child: Text(isEditing ? 'Update' : 'Add'),
+              child: Text('Add'),
             ),
           ],
         );
@@ -74,53 +73,22 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Courses')),
-      body: ListView.builder(
-        itemCount: courses.length,
-        itemBuilder: (context, index) {
-          final course = courses[index];
-          return Dismissible(
-            key: ValueKey(course.hashCode ^ index),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
+      body:
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+              itemCount: courses.length,
+              itemBuilder: (context, index) {
+                final course = courses[index];
+                return ListTile(
+                  title: Text(course.name),
+                  subtitle: 
+                      course.description != null
+                          ? Text(course.description!)
+                          : null,
+                );
+              },
             ),
-            confirmDismiss: (_) async {
-              return await showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text('Confirm Deletion'),
-                    content: const Text('Are you sure you want to delete this course?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            onDismissed: (_) => presenter.removeCourse(index),
-            child: ListTile(
-              title: Text(course.name),
-              subtitle: course.description != null ? Text(course.description!) : null,
-              trailing: IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () => _showAddCourseDialog(existing: course, index: index),
-              ),
-              onTap: () => _showAddCourseDialog(existing: course, index: index),
-            ),
-          );
-        },
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddCourseDialog,
         child: const Icon(Icons.add),
