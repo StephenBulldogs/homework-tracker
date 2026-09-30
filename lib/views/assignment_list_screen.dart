@@ -61,10 +61,27 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final assignments = _presenter.assignments;
+    final assignments = _presenter.filteredAssignments;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Assignments')),
+      appBar: AppBar(
+        title: const Text('Assignments'),
+        actions: [
+          PopupMenuButton<AssignmentFilter>(
+            icon: const Icon(Icons.filter_list),
+            tooltip: 'Filter',
+            initialValue: _presenter.filter,
+            onSelected: (filter) {
+              setState(() => _presenter.setFilter(filter));
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: AssignmentFilter.all, child: Text('All')),
+              PopupMenuItem(value: AssignmentFilter.active, child: Text('Active')),
+              PopupMenuItem(value: AssignmentFilter.completed, child: Text('Completed')),
+            ],
+          ),
+        ],
+      ),
       body: 
           _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -76,9 +93,17 @@ class _AssignmentListScreenState extends State<AssignmentListScreen> {
                     title: Text(assignment.title),
                     value: assignment.isCompleted, 
                     onChanged: (_) async {
-                      await _presenter.toggleCompleted(index);
+                      await _presenter.toggleCompleted(assignment);
                       setState(() {});
                     },
+                    secondary: IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      tooltip: 'Delete',
+                      onPressed: () async {
+                        await _presenter.deleteAssignment(assignment);
+                        setState(() {});
+                      },
+                    ),
                   );
                 },
               ),
